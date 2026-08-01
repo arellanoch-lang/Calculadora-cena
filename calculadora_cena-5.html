@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reparto de la cuenta</title>
+<style>
+  :root{
+    --coral:#FF4B3E;
+    --dark:#1a1a1a;
+    --gray:#6b6b6b;
+    --bg:#f5f4f2;
+    --card:#ffffff;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Segoe UI', Arial, sans-serif;
+    background:var(--bg);
+    color:var(--dark);
+    padding:24px 16px 60px;
+    display:flex;
+    justify-content:center;
+  }
+  .wrap{width:100%; max-width:480px;}
+  h1{
+    font-size:1.5rem;
+    margin-bottom:4px;
+    letter-spacing:0.5px;
+  }
+  .subtitle{
+    color:var(--gray);
+    font-size:0.9rem;
+    margin-bottom:20px;
+  }
+  .card{
+    background:var(--card);
+    border-radius:14px;
+    padding:20px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.06);
+    margin-bottom:16px;
+  }
+  label{
+    display:block;
+    font-size:0.85rem;
+    font-weight:600;
+    color:var(--gray);
+    margin-bottom:6px;
+  }
+  input[type="number"], input[type="text"]{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    font-size:1rem;
+    margin-bottom:14px;
+  }
+  input:focus{outline:none; border-color:var(--coral);}
+  .row{
+    display:flex;
+    gap:12px;
+  }
+  .row > div{flex:1;}
+  .result{
+    background:var(--dark);
+    color:#fff;
+    border-radius:14px;
+    padding:20px;
+    margin-bottom:16px;
+  }
+  .result h2{
+    font-size:0.85rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:#bbb;
+    margin-bottom:10px;
+  }
+  .price-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    padding:6px 0;
+    border-bottom:1px solid rgba(255,255,255,0.1);
+  }
+  .price-row:last-child{border-bottom:none;}
+  .price-row .label{font-size:0.95rem; color:#ddd;}
+  .price-row .value{font-size:1.2rem; font-weight:700; color:var(--coral);}
+  .price-row .value.total{color:#fff; font-size:1.4rem;}
+
+  .families h3{
+    font-size:1rem;
+    margin-bottom:10px;
+  }
+  .family-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#fafafa;
+    border:1px solid #eee;
+    border-radius:10px;
+    padding:10px 12px;
+    margin-bottom:8px;
+  }
+  .family-item input[type="text"]{margin:0; flex:2; min-width:0;}
+  .family-item input[type="number"]{margin:0; flex:1; min-width:0;}
+  .family-item .mini-label{font-size:0.7rem; color:var(--gray); display:block; margin-bottom:2px;}
+  .family-item .field{flex:1; min-width:0;}
+  .family-item .remove-btn{
+    background:none;
+    border:none;
+    color:#bbb;
+    font-size:1.3rem;
+    cursor:pointer;
+    padding:0 4px;
+    line-height:1;
+  }
+  .family-item .remove-btn:hover{color:var(--coral);}
+  .family-result{
+    display:flex;
+    justify-content:space-between;
+    padding:8px 4px;
+    border-bottom:1px solid #eee;
+    font-size:0.95rem;
+  }
+  .family-result:last-child{border-bottom:none;}
+  .family-result .amount{font-weight:700; color:var(--coral);}
+  button.add-btn{
+    width:100%;
+    padding:10px;
+    border:2px dashed #ccc;
+    background:none;
+    border-radius:10px;
+    color:var(--gray);
+    font-size:0.9rem;
+    cursor:pointer;
+    margin-top:4px;
+  }
+  button.add-btn:hover{border-color:var(--coral); color:var(--coral);}
+  .note{
+    font-size:0.78rem;
+    color:var(--gray);
+    margin-top:6px;
+  }
+  .warning{
+    color:var(--coral);
+    font-size:0.85rem;
+    margin-top:6px;
+  }
+  .whatsapp-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    width:100%;
+    padding:12px;
+    background:#25D366;
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    font-size:0.95rem;
+    font-weight:600;
+    cursor:pointer;
+    margin-top:14px;
+  }
+  .whatsapp-btn:hover{background:#1fb959;}
+  .whatsapp-btn svg{width:18px; height:18px; fill:#fff;}
+  footer{
+    text-align:center;
+    font-size:0.7rem;
+    color:#bbb;
+    margin-top:24px;
+    line-height:1.5;
+  }
+  footer a{color:#bbb; text-decoration:none;}
+  footer a:hover{color:var(--coral);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Reparto de la cuenta</h1>
+  <div class="subtitle">Un niño cuenta como medio adulto</div>
+
+  <div class="card">
+    <label for="total">Total de la cuenta (€)</label>
+    <input type="number" id="total" min="0" step="0.01" placeholder="0.00">
+
+    <div class="row">
+      <div>
+        <label for="adultos">Adultos</label>
+        <input type="number" id="adultos" min="0" step="1" value="0">
+      </div>
+      <div>
+        <label for="ninos">Niños</label>
+        <input type="number" id="ninos" min="0" step="1" value="0">
+      </div>
+    </div>
+  </div>
+
+  <div class="result">
+    <h2>Precio por persona</h2>
+    <div class="price-row">
+      <span class="label">Por adulto</span>
+      <span class="value" id="precioAdulto">0.00 €</span>
+    </div>
+    <div class="price-row">
+      <span class="label">Por niño</span>
+      <span class="value" id="precioNino">0.00 €</span>
+    </div>
+    <div class="price-row">
+      <span class="label">Total repartido</span>
+      <span class="value total" id="totalCheck">0.00 €</span>
+    </div>
+  </div>
+  <div class="warning" id="warning"></div>
+
+  <button class="whatsapp-btn" id="shareBtn">
+    <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.001 2C6.478 2 2 6.477 2 12c0 1.898.527 3.671 1.443 5.184L2 22l4.938-1.408A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12.001 2zm0 18.135c-1.686 0-3.256-.494-4.577-1.343l-.328-.203-3.09.881.9-2.981-.213-.339A8.135 8.135 0 0 1 3.865 12c0-4.487 3.65-8.135 8.136-8.135 4.487 0 8.135 3.648 8.135 8.135 0 4.486-3.648 8.135-8.135 8.135z"/></svg>
+    Compartir por WhatsApp
+  </button>
+
+  <div class="card families">
+    <h3>Por familia (opcional)</h3>
+    <div id="familyList"></div>
+    <button class="add-btn" id="addFamily">+ Añadir familia</button>
+    <div class="note">Añade cada familia con sus adultos y niños para ver cuánto le toca pagar a cada una.</div>
+  </div>
+
+  <div class="card" id="familyResultsCard" style="display:none;">
+    <h3 style="margin-bottom:10px;">Cuánto paga cada familia</h3>
+    <div id="familyResults"></div>
+  </div>
+
+  <footer>
+    Desarrollado y propiedad de Christel Arellano · <a href="mailto:arellano.ch@gmail.com">arellano.ch@gmail.com</a>
+  </footer>
+</div>
+
+<script>
+  const totalInput = document.getElementById('total');
+  const adultosInput = document.getElementById('adultos');
+  const ninosInput = document.getElementById('ninos');
+  const precioAdultoEl = document.getElementById('precioAdulto');
+  const precioNinoEl = document.getElementById('precioNino');
+  const totalCheckEl = document.getElementById('totalCheck');
+  const warningEl = document.getElementById('warning');
+  const familyList = document.getElementById('familyList');
+  const addFamilyBtn = document.getElementById('addFamily');
+  const familyResultsCard = document.getElementById('familyResultsCard');
+  const familyResults = document.getElementById('familyResults');
+
+  let families = [];
+  let familyIdCounter = 0;
+
+  function fmt(n){
+    return n.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €';
+  }
+
+  function calcSharePrice(){
+    const total = parseFloat(totalInput.value) || 0;
+    const adultos = parseFloat(adultosInput.value) || 0;
+    const ninos = parseFloat(ninosInput.value) || 0;
+    const totalPartes = adultos + ninos * 0.5;
+
+    if(totalPartes <= 0){
+      warningEl.textContent = total > 0 ? 'Introduce al menos un comensal (adulto o niño).' : '';
+      return 0;
+    }
+    warningEl.textContent = '';
+    return total / totalPartes;
+  }
+
+  function render(){
+    const precioPorParte = calcSharePrice();
+    const precioAdulto = precioPorParte;
+    const precioNino = precioPorParte * 0.5;
+
+    precioAdultoEl.textContent = fmt(precioAdulto);
+    precioNinoEl.textContent = fmt(precioNino);
+
+    const adultos = parseFloat(adultosInput.value) || 0;
+    const ninos = parseFloat(ninosInput.value) || 0;
+    const totalCheck = adultos * precioAdulto + ninos * precioNino;
+    totalCheckEl.textContent = fmt(totalCheck);
+
+    renderFamilyResults(precioPorParte);
+  }
+
+  function renderFamilyList(){
+    familyList.innerHTML = '';
+    families.forEach(f => {
+      const item = document.createElement('div');
+      item.className = 'family-item';
+      item.innerHTML = `
+        <div class="field">
+          <span class="mini-label">Nombre</span>
+          <input type="text" data-id="${f.id}" data-field="name" value="${f.name}" placeholder="Familia">
+        </div>
+        <div class="field" style="max-width:70px;">
+          <span class="mini-label">Adultos</span>
+          <input type="number" data-id="${f.id}" data-field="adultos" min="0" step="1" value="${f.adultos}">
+        </div>
+        <div class="field" style="max-width:70px;">
+          <span class="mini-label">Niños</span>
+          <input type="number" data-id="${f.id}" data-field="ninos" min="0" step="1" value="${f.ninos}">
+        </div>
+        <button class="remove-btn" data-id="${f.id}" title="Eliminar">×</button>
+      `;
+      familyList.appendChild(item);
+    });
+
+    familyList.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('input', e => {
+        const id = parseInt(e.target.dataset.id);
+        const field = e.target.dataset.field;
+        const fam = families.find(f => f.id === id);
+        if(!fam) return;
+        if(field === 'name') fam.name = e.target.value;
+        else fam[field] = parseFloat(e.target.value) || 0;
+        render();
+      });
+    });
+
+    familyList.querySelectorAll('.remove-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const id = parseInt(e.target.dataset.id);
+        families = families.filter(f => f.id !== id);
+        renderFamilyList();
+        render();
+      });
+    });
+  }
+
+  function renderFamilyResults(precioPorParte){
+    if(families.length === 0){
+      familyResultsCard.style.display = 'none';
+      return;
+    }
+    familyResultsCard.style.display = 'block';
+    familyResults.innerHTML = '';
+    families.forEach(f => {
+      const partes = f.adultos + f.ninos * 0.5;
+      const amount = partes * precioPorParte;
+      const row = document.createElement('div');
+      row.className = 'family-result';
+      const name = f.name && f.name.trim() ? f.name : 'Sin nombre';
+      row.innerHTML = `<span>${name} (${f.adultos} adultos, ${f.ninos} niños)</span><span class="amount">${fmt(amount)}</span>`;
+      familyResults.appendChild(row);
+    });
+  }
+
+  function buildShareMessage(){
+    const total = parseFloat(totalInput.value) || 0;
+    const adultos = parseFloat(adultosInput.value) || 0;
+    const ninos = parseFloat(ninosInput.value) || 0;
+    const precioPorParte = calcSharePrice();
+    const precioAdulto = precioPorParte;
+    const precioNino = precioPorParte * 0.5;
+
+    let msg = `🧾 *Reparto de la cuenta*\n`;
+    msg += `Total: ${fmt(total)}\n`;
+    msg += `Comensales: ${adultos} adultos, ${ninos} niños\n\n`;
+    msg += `👤 Por adulto: ${fmt(precioAdulto)}\n`;
+    msg += `🧒 Por niño: ${fmt(precioNino)}\n`;
+
+    if(families.length > 0){
+      msg += `\n👨‍👩‍👧 *Por familia:*\n`;
+      families.forEach(f => {
+        const partes = f.adultos + f.ninos * 0.5;
+        const amount = partes * precioPorParte;
+        const name = f.name && f.name.trim() ? f.name : 'Sin nombre';
+        msg += `${name}: ${fmt(amount)} (${f.adultos} adultos, ${f.ninos} niños)\n`;
+      });
+    }
+    return msg;
+  }
+
+  document.getElementById('shareBtn').addEventListener('click', () => {
+    const msg = buildShareMessage();
+    const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+    window.open(url, '_blank');
+  });
+
+  addFamilyBtn.addEventListener('click', () => {
+    familyIdCounter++;
+    families.push({id: familyIdCounter, name: '', adultos: 1, ninos: 0});
+    renderFamilyList();
+    render();
+  });
+
+  [totalInput, adultosInput, ninosInput].forEach(el => el.addEventListener('input', render));
+
+  render();
+</script>
+</body>
+</html>
